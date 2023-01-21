@@ -100,7 +100,7 @@ It will monitor the actions, observations, and rewards, indicating what action o
 
 .. code-block:: python
 
-  import gym
+  import gymnasium as gym
   from gym import spaces
   import numpy as np
 

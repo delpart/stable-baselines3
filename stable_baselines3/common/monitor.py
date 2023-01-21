@@ -7,7 +7,7 @@ import time
 from glob import glob
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-import gym
+import gymnasium as gym
 import numpy as np
 import pandas
 
@@ -92,7 +92,7 @@ class Monitor(gym.Wrapper):
         """
         if self.needs_reset:
             raise RuntimeError("Tried to step environment that needs reset")
-        observation, reward, done, info = self.env.step(action)
+        observation, reward, done, truncated, info = self.env.step(action)
         self.rewards.append(reward)
         if done:
             self.needs_reset = True
@@ -109,7 +109,7 @@ class Monitor(gym.Wrapper):
                 self.results_writer.write_row(ep_info)
             info["episode"] = ep_info
         self.total_steps += 1
-        return observation, reward, done, info
+        return observation, reward, done, truncated, info
 
     def close(self) -> None:
         """

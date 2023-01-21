@@ -1,4 +1,4 @@
-import gym
+import gymnasium as gym
 import numpy as np
 from gym import spaces
 
@@ -37,9 +37,9 @@ class NoopResetEnv(gym.Wrapper):
         assert noops > 0
         obs = np.zeros(0)
         for _ in range(noops):
-            obs, _, done, _ = self.env.step(self.noop_action)
+            obs, _, done, _, _ = self.env.step(self.noop_action)
             if done:
-                obs = self.env.reset(**kwargs)
+                obs, _ = self.env.reset(**kwargs)
         return obs
 
 
@@ -57,10 +57,10 @@ class FireResetEnv(gym.Wrapper):
 
     def reset(self, **kwargs) -> np.ndarray:
         self.env.reset(**kwargs)
-        obs, _, done, _ = self.env.step(1)
+        obs, _, done, _, _ = self.env.step(1)
         if done:
             self.env.reset(**kwargs)
-        obs, _, done, _ = self.env.step(2)
+        obs, _, done, _, _ = self.env.step(2)
         if done:
             self.env.reset(**kwargs)
         return obs
@@ -80,7 +80,7 @@ class EpisodicLifeEnv(gym.Wrapper):
         self.was_real_done = True
 
     def step(self, action: int) -> GymStepReturn:
-        obs, reward, done, info = self.env.step(action)
+        obs, reward, done, truncated, info = self.env.step(action)
         self.was_real_done = done
         # check current lives, make loss of life terminal,
         # then update lives to handle bonus lives
@@ -103,10 +103,10 @@ class EpisodicLifeEnv(gym.Wrapper):
         :return: the first observation of the environment
         """
         if self.was_real_done:
-            obs = self.env.reset(**kwargs)
+            obs, _ = self.env.reset(**kwargs)
         else:
             # no-op step to advance from terminal/lost life state
-            obs, _, _, _ = self.env.step(0)
+            obs, _, _, _, _ = self.env.step(0)
         self.lives = self.env.unwrapped.ale.lives()
         return obs
 
@@ -136,7 +136,7 @@ class MaxAndSkipEnv(gym.Wrapper):
         total_reward = 0.0
         done = False
         for i in range(self._skip):
-            obs, reward, done, info = self.env.step(action)
+            obs, reward, done, truncated, info = self.env.step(action)
             if i == self._skip - 2:
                 self._obs_buffer[0] = obs
             if i == self._skip - 1:
@@ -148,7 +148,7 @@ class MaxAndSkipEnv(gym.Wrapper):
         # doesn't matter
         max_frame = self._obs_buffer.max(axis=0)
 
-        return max_frame, total_reward, done, info
+        return max_frame, total_reward, done, truncated, info
 
     def reset(self, **kwargs) -> GymObs:
         return self.env.reset(**kwargs)

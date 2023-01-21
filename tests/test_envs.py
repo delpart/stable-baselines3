@@ -1,7 +1,7 @@
 import types
 import warnings
 
-import gym
+import gymnasium as gym
 import numpy as np
 import pytest
 from gym import spaces

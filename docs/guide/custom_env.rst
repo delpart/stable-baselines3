@@ -26,7 +26,7 @@ That is to say, your environment must implement the following methods (and inher
 
 .. code-block:: python
 
-  import gym
+  import gymnasium as gym
   import numpy as np
   from gym import spaces
 

@@ -1,7 +1,7 @@
 import warnings
 from typing import Any, Dict, Union
 
-import gym
+import gymnasium as gym
 import numpy as np
 from gym import spaces
 
@@ -94,7 +94,7 @@ def _check_nan(env: gym.Env) -> None:
     vec_env = VecCheckNan(DummyVecEnv([lambda: env]))
     for _ in range(10):
         action = np.array([env.action_space.sample()])
-        _, _, _, _ = vec_env.step(action)
+        _, _, _, _, _ = vec_env.step(action)
 
 
 def _is_goal_env(env: gym.Env) -> bool:
@@ -199,7 +199,7 @@ def _check_returned_values(env: gym.Env, observation_space: spaces.Space, action
     Check the returned values by the env when calling `.reset()` or `.step()` methods.
     """
     # because env inherits from gym.Env, we assume that `reset()` and `step()` methods exists
-    obs = env.reset()
+    obs, _ = env.reset()
 
     if _is_goal_env(env):
         # Make mypy happy, already checked
@@ -226,10 +226,10 @@ def _check_returned_values(env: gym.Env, observation_space: spaces.Space, action
     action = action_space.sample()
     data = env.step(action)
 
-    assert len(data) == 4, "The `step()` method must return four values: obs, reward, done, info"
+    assert len(data) == 5, "The `step()` method must return four values: obs, reward, done, truncated, info"
 
     # Unpack
-    obs, reward, done, info = data
+    obs, reward, done, truncated, info = data
 
     if _is_goal_env(env):
         # Make mypy happy, already checked

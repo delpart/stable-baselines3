@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, TypeVar, Union
 
-import gym
+import gymnasium as gym
 import numpy as np
 import torch as th
 from gym import spaces
